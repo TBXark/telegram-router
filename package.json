@@ -1,0 +1,39 @@
+{
+  "name": "telegram-router",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A simple and powerful telegram bot router",
+  "author": "tbxark <tbxark@outlook.com>",
+  "license": "MIT",
+  "repository": "git@github.com:TBXark/telegram-router.git",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/counter.umd.cjs",
+  "module": "./dist/counter.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint --fix src",
+    "start:example": "tsx test/example.ts"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^2.27.3",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/node": "^22.5.1",
+    "eslint": "^9.8.0",
+    "rollup-plugin-node-externals": "^7.1.3",
+    "telegram-bot-api-types": "^7.9.12",
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.10",
+    "vitest": "^2.0.5"
+  }
+}
