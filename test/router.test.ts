@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import {TelegramRouter, TextMatch, CallbackMatch } from '../src/telegram.ts';
+import {TelegramRouter, TextMatch, CallbackMatch } from '../src';
 import type * as Telegram from 'telegram-bot-api-types';
 
 describe('TextMatch', () => {

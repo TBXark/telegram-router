@@ -1,6 +1,6 @@
 export type AbstractMatchFunction<Update, Args extends Array<any> = any[]> = (update: Update, ...args: Args) => boolean;
 export type AbstractHandlerFunction<Update, Result, Args extends Array<any> = any[]> = (update: Update, ...args: Args) => Promise<Result>;
-export type AbstractMiddlewareFunction<Update, Result, Args extends Array<any> = any[]> = (update: Update, next: AbstractHandlerFunction<Update, Result>, ...args: Args) => Promise<Result | void>;
+export type AbstractMiddlewareFunction<Update, Result, Args extends Array<any> = any[]> = (update: Update, next: AbstractHandlerFunction<Update, Result>, ...args: Args) => Promise<Result | void> | void;
 export type AbstractErrorHandlerFunction<Update, Result, Args extends Array<any> = any[]> = (update: Update, error: Error, ...args: Args) => Promise<Result>;
 
 function execute<Update, Result, Args extends Array<any> = any[]>(
@@ -11,7 +11,7 @@ function execute<Update, Result, Args extends Array<any> = any[]>(
 ): Promise<Result> {
     let index = 0;
     const next = async (update: Update, ...args: Args): Promise<Result> => {
-        if (index < middlewares.length) {
+        if (index < (middlewares?.length ?? 0)) {
             const middleware = middlewares[index];
             index++;
             const result = await middleware(update, next, ...args);
@@ -32,7 +32,8 @@ export class AbstractHandler<Update, Result, Args extends Array<any> = any[]> {
     constructor(match: AbstractMatchFunction<Update, Args>, handler: AbstractHandlerFunction<Update, Result, Args>, middlewares: AbstractMiddlewareFunction<Update, Result, Args>[] = []) {
         this.match = match;
         this.handler = handler;
-        this.middlewares = middlewares;
+        this.middlewares = middlewares ?? [];
+        this.handle = this.handle.bind(this);
     }
 
     async handle(update: Update, ...args: Args): Promise<Result> {
@@ -47,6 +48,11 @@ export class AbstractRouter<Update, Result, Args extends Array<any> = any[]> {
 
     constructor() {
         this.routes = new Map();
+        this.middlewares = [];
+        this.fetch = this.fetch.bind(this);
+        this.with = this.with.bind(this);
+        this.handle = this.handle.bind(this);
+        this.remove = this.remove.bind(this);
     }
 
     async fetch(update: Update, ...args: Args): Promise<Result> {
@@ -65,9 +71,8 @@ export class AbstractRouter<Update, Result, Args extends Array<any> = any[]> {
         throw new Error('No handler');
     }
 
-    with(...middlewares: AbstractMiddlewareFunction<Update, Result, Args>[]): AbstractRouter<Update, Result, Args> {
+    with(...middlewares: AbstractMiddlewareFunction<Update, Result, Args>[]) {
         this.middlewares.push(...middlewares);
-        return this;
     }
 
     handle(match: AbstractMatchFunction<Update, Args>, handler: AbstractHandlerFunction<Update, Result, Args>, ...middlewares: AbstractMiddlewareFunction<Update, Result, Args>[]): string {

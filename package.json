@@ -1,6 +1,6 @@
 {
   "name": "telegram-router",
-  "version": "1.0.1",
+  "version": "1.0.4",
   "type": "module",
   "description": "A simple and powerful telegram bot router",
   "author": "tbxark <tbxark@outlook.com>",

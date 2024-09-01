@@ -20,6 +20,7 @@ export default defineConfig({
       entry: './src/index.ts',
       fileName: 'index',
       formats: ['es', 'cjs'],
-    }
+    },
+    minify: false
   }
 })
