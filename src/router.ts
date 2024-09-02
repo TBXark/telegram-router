@@ -71,14 +71,24 @@ export class AbstractRouter<Update, Result, Args extends Array<any> = any[]> {
         throw new Error('No handler');
     }
 
-    with(...middlewares: AbstractMiddlewareFunction<Update, Result, Args>[]) {
+    with(...middlewares: AbstractMiddlewareFunction<Update, Result, Args>[]): this {
         this.middlewares.push(...middlewares);
+        return this;
     }
 
     handle(match: AbstractMatchFunction<Update, Args>, handler: AbstractHandlerFunction<Update, Result, Args>, ...middlewares: AbstractMiddlewareFunction<Update, Result, Args>[]): string {
         const key = randomUUID();
         this.routes.set(key, new AbstractHandler(match, handler, middlewares));
         return key;
+    }
+
+    rename(oldKey: string, newKey: string): void {
+        const handler = this.routes.get(oldKey);
+        if (handler == null) {
+            throw new Error('Handler not found');
+        }
+        this.routes.set(newKey, handler);
+        this.routes.delete(oldKey);
     }
 
     remove(key: string): void {
