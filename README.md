@@ -2,11 +2,13 @@
  
 `telegram-router` is a simple javascript library that helps you to route messages from telegram bot to your application.
 
+
 ## Installation
 
 ```bash
 npm install telegram-router
 ```
+
 
 ## Usage
 
@@ -22,6 +24,11 @@ bot.handleWith('/admin', UpdateType.Message, MatchType.Exact, async (update: Tel
 
 bot.fetch(update);
 ```
+
+
+## Example
+
+- [telegram-bot-workers-template](https://github.com/TBXark/telegram-bot-workers-template): The basic template for running a Telegram Bot on Cloudflare Workers.
 
 
 ## License
