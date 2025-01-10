@@ -57,10 +57,10 @@ export class AbstractRouter<Update, Result, Args extends Array<any> = any[]> {
 
     async fetch(update: Update, ...args: Args): Promise<Result> {
         for (const route of this.routes) {
-            const [_ , handler] = route;
+            const [_, handler] = route;
             if (handler.match(update, ...args)) {
                 try {
-                    return execute(handler.handle, this.middlewares, update, ...args);
+                    return await execute(handler.handle, this.middlewares, update, ...args);
                 } catch (error) {
                     if (this.errorHandler == null) {
                         throw error;
