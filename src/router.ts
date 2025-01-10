@@ -42,12 +42,12 @@ export class AbstractHandler<Update, Result, Args extends Array<any> = any[]> {
 }
 
 export class AbstractRouter<Update, Result, Args extends Array<any> = any[]> {
-    private readonly routes: Map<string, AbstractHandler<Update, Result, Args>>;
+    private readonly routes: Array<[string, AbstractHandler<Update, Result, Args>]>;
     private readonly middlewares: AbstractMiddlewareFunction<Update, Result, Args>[];
     errorHandler?: AbstractErrorHandlerFunction<Update, Result>;
 
     constructor() {
-        this.routes = new Map();
+        this.routes = [];
         this.middlewares = [];
         this.fetch = this.fetch.bind(this);
         this.with = this.with.bind(this);
@@ -56,7 +56,8 @@ export class AbstractRouter<Update, Result, Args extends Array<any> = any[]> {
     }
 
     async fetch(update: Update, ...args: Args): Promise<Result> {
-        for (const handler of this.routes.values()) {
+        for (const route of this.routes) {
+            const [_ , handler] = route;
             if (handler.match(update, ...args)) {
                 try {
                     return execute(handler.handle, this.middlewares, update, ...args);
@@ -78,21 +79,25 @@ export class AbstractRouter<Update, Result, Args extends Array<any> = any[]> {
 
     handle(match: AbstractMatchFunction<Update, Args>, handler: AbstractHandlerFunction<Update, Result, Args>, ...middlewares: AbstractMiddlewareFunction<Update, Result, Args>[]): string {
         const key = randomUUID();
-        this.routes.set(key, new AbstractHandler(match, handler, middlewares));
+        this.routes.push([key, new AbstractHandler(match, handler, middlewares)]);
         return key;
     }
 
     rename(oldKey: string, newKey: string): void {
-        const handler = this.routes.get(oldKey);
-        if (handler == null) {
-            throw new Error('Handler not found');
+        const index = this.routes.findIndex(([key, _]) => key === oldKey);
+        if (index === -1) {
+            throw new Error('No handler');
         }
-        this.routes.set(newKey, handler);
-        this.routes.delete(oldKey);
+        const [, handler] = this.routes[index];
+        this.routes[index] = [newKey, handler];
     }
 
     remove(key: string): void {
-        this.routes.delete(key);
+        const index = this.routes.findIndex(([routeKey, _]) => routeKey === key);
+        if (index === -1) {
+            throw new Error('No handler');
+        }
+        this.routes.splice(index, 1);
     }
 }
 
